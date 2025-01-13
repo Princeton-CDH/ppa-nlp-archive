@@ -29,6 +29,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+type-checking = [
+  "mypy",
+  "types-tqdm",
+]
 test = [
   "pytest",
   "pytest-cov",
@@ -36,7 +40,8 @@ test = [
 ]
 ocr = ["google-cloud-vision"]
 poem_id = ["pyarrow", "polars", "unidecode", "rapidfuzz"]
-dev = ["pre-commit", "ruff", "corppa[test]", "corppa[ocr]", "corppa[poem_id]"]
+passim = ["passim @ git+https://github.com/dasmiq/passim.git"]
+dev = ["pre-commit", "ruff", "corppa[type-checking]", "corppa[test]", "corppa[ocr]", "corppa[poem_id]", "corppa[passim]"]
 
 [project.scripts]
 corppa-filter = "corppa.utils.filter:main"
@@ -49,3 +54,7 @@ path = "src/corppa/__init__.py"
 [tool.ruff]
 # configure src path so ruff import fixes can identify local imports
 src = ["src"]
+
+[tool.hatch.metadata]
+# so passim can be installed from GitHub (i.e., direct reference)
+allow-direct-references = true
