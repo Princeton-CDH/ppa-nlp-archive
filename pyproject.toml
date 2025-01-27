@@ -9,7 +9,7 @@ requires-python = ">=3.11"
 readme = "README.md"
 # license TBD
 #license.file = "LICENSE"
-#license = {text = "Apache-2"} 
+#license = {text = "Apache-2"}
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
@@ -18,7 +18,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Information Analysis",
-    "Topic :: Text Processing",    
+    "Topic :: Text Processing",
     "Topic :: Utilities",
 ]
 dynamic = ["version"]
@@ -35,11 +35,20 @@ type-checking = [
 ]
 test = [
   "pytest",
-  "pytest-cov"
+  "pytest-cov",
+  "corppa[poem_id]"
 ]
 ocr = ["google-cloud-vision"]
-passim = ["passim @ git+https://github.com/dasmiq/passim.git"]  
-dev = ["pre-commit", "ruff", "corppa[type-checking]", "corppa[test]", "corppa[ocr]", "corppa[passim]"]
+poem_id = [
+  "pyarrow",
+  "polars",
+  "unidecode",
+  "rapidfuzz",
+  # Conditional
+  'more-itertools; python_version < "3.12"',
+]
+passim = ["passim @ git+https://github.com/dasmiq/passim.git"]
+dev = ["pre-commit", "ruff", "corppa[type-checking]", "corppa[test]", "corppa[ocr]", "corppa[poem_id]", "corppa[passim]"]
 
 [project.scripts]
 corppa-filter = "corppa.utils.filter:main"
