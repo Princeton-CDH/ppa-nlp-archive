@@ -5,23 +5,25 @@ build-backend = "hatchling.build"
 [project]
 name = "corppa"
 description = "Utilities for working with Princeton Prosody Archive full-text corpus"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 readme = "README.md"
 # license TBD
 #license.file = "LICENSE"
-#license = {text = "Apache-2"} 
+#license = {text = "Apache-2"}
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.11",
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Information Analysis",
-    "Topic :: Text Processing",    
+    "Topic :: Text Processing",
     "Topic :: Utilities",
 ]
 dynamic = ["version"]
 dependencies = [
+	"intspan",
 	"orjsonl",
 	"tqdm",
   "bs4",
@@ -30,20 +32,42 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+type-checking = [
+  "mypy",
+  "types-tqdm",
+]
 test = [
   "pytest",
-  "pytest-cov"
+  "pytest-cov",
+  "corppa[poem_id]"
 ]
 ocr = ["google-cloud-vision"]
-dev = ["pre-commit", "corppa[test]", "corppa[ocr]"]
+poem_id = [
+  "pyarrow",
+  "polars",
+  "unidecode",
+  "rapidfuzz",
+  # Conditional
+  'more-itertools; python_version < "3.12"',
+]
+passim = ["passim @ git+https://github.com/dasmiq/passim.git"]
+dev = ["pre-commit", "ruff", "corppa[type-checking]", "corppa[test]", "corppa[ocr]", "corppa[poem_id]", "corppa[passim]"]
 
 [project.scripts]
-corppa-filter-corpus = "corppa.utils.filter:main"
+corppa-filter = "corppa.utils.filter:main"
 corppa-ocr = "corppa.ocr.gvision_ocr:main"
+collate-txt = "corppa.ocr.collate_txt:main"
 
 [tool.hatch.version]
 path = "src/corppa/__init__.py"
 
+[tool.pytest.ini_options]
+testpaths = ["test"]
+
 [tool.ruff]
 # configure src path so ruff import fixes can identify local imports
 src = ["src"]
+
+[tool.hatch.metadata]
+# so passim can be installed from GitHub (i.e., direct reference)
+allow-direct-references = true
