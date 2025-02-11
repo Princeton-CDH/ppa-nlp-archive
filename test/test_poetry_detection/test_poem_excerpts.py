@@ -6,7 +6,7 @@ from corppa.poetry_detection.poem_excerpts import PoemExcerpt
 class TestPoemExcerpt:
     def test_init(self):
         # Invalid PPA span indices
-        error_message = "PPA span's start index must be less than end index"
+        error_message = "PPA span's start index 0 must be less than its end index 0"
         with pytest.raises(ValueError, match=error_message):
             poem_excerpt = PoemExcerpt(
                 page_id="page_id",
@@ -18,6 +18,7 @@ class TestPoemExcerpt:
                 detection_methods={"detect"},
                 identification_methods={"id"},
             )
+        error_message = "PPA span's start index 1 must be less than its end index 0"
         with pytest.raises(ValueError, match=error_message):
             poem_excerpt = PoemExcerpt(
                 page_id="page_id",
@@ -56,7 +57,9 @@ class TestPoemExcerpt:
                 ref_span_end=1,
             )
         # Invalid reference span indices
-        error_message = "Reference span's start index must be less than end index"
+        error_message = (
+            "Reference span's start index 0 must be less than its end index 0"
+        )
         with pytest.raises(ValueError, match=error_message):
             poem_excerpt = PoemExcerpt(
                 page_id="page_id",
@@ -70,6 +73,9 @@ class TestPoemExcerpt:
                 ref_span_start=0,
                 ref_span_end=0,
             )
+        error_message = (
+            "Reference span's start index 1 must be less than its end index 0"
+        )
         with pytest.raises(ValueError, match=error_message):
             poem_excerpt = PoemExcerpt(
                 page_id="page_id",
