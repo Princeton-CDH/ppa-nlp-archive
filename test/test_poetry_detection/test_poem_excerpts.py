@@ -4,7 +4,7 @@ from corppa.poetry_detection.poem_excerpts import PoemExcerpt
 
 
 class TestPoemExcerpt:
-    def test_to_json(self):
+    def test_to_dict(self):
         # No optional fields
         poem_excerpt = PoemExcerpt(
             page_id="page_id",
@@ -23,15 +23,11 @@ class TestPoemExcerpt:
             "ppa_span_text": "page_text",
             "poem_id": "poem_id",
             "ref_corpus": "corpus_id",
-            "ref_span_start": None,
-            "ref_span_end": None,
-            "ref_span_text": None,
             "detection_methods": ["detect"],
             "identification_methods": ["id"],
-            "notes": None,
         }
 
-        result = poem_excerpt.to_json()
+        result = poem_excerpt.to_dict()
         assert result == expected_result
 
         # With optional fields
@@ -47,5 +43,5 @@ class TestPoemExcerpt:
             "notes": "notes",
         }
 
-        result = poem_excerpt.to_json()
+        result = poem_excerpt.to_dict()
         assert result == expected_result

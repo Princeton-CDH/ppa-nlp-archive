@@ -2,7 +2,7 @@
 Custom data type for poetry excerpts identified with the text of PPA pages.
 """
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any, Optional
 
 
@@ -29,23 +29,17 @@ class PoemExcerpt:
     identification_methods: set[str]
     notes: Optional[str] = None
 
-    def to_json(self) -> dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
-        Returns a JSON-style dict of the poem excerpt
+        Returns a JSON-friendly dict of the poem excerpt. Note that unset optional fields
+        are not included.
         """
-        json_dict = {
-            "page_id": self.page_id,
-            "poem_id": self.poem_id,
-            "ppa_span_start": self.ppa_span_start,
-            "ppa_span_end": self.ppa_span_end,
-            "ppa_span_text": self.ppa_span_text,
-            "poem_id": self.poem_id,
-            "ref_corpus": self.ref_corpus,
-            "ref_span_start": self.ref_span_start,
-            "ref_span_end": self.ref_span_end,
-            "ref_span_text": self.ref_span_text,
-            "detection_methods": list(self.detection_methods),
-            "identification_methods": list(self.identification_methods),
-            "notes": self.notes,
-        }
+        json_dict = asdict(self)
+        json_dict["detection_methods"] = list(self.detection_methods)
+        json_dict["identification_methods"] = list(self.identification_methods)
+
+        # Remove optional fields if set to None
+        for field in ["ref_span_start", "ref_span_end", "ref_span_text", "notes"]:
+            if json_dict[field] is None:
+                del json_dict[field]
         return json_dict
