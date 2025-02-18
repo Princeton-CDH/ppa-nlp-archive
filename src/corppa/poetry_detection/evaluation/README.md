@@ -48,6 +48,25 @@ $$
 overlap\textunderscore factor(a, b) = \frac{\min(a_{end}, b_{end}) - \max(a_{start}, b_{start})}{\max(a_{end}-a_{start}, b_{end}-b_{start})}
 $$
 
+
+For example, if we have **span a** with length 5 and **span b** with length 7 and a and b have an overlap 4, the overlap factor for a and b would be $\frac{4}{7}$, since span b is the longer of the two spans.
+
+```mermaid
+block-beta
+columns 9
+a["Span a"]:5
+space:3
+space:2
+b["Span b"]:7
+space:2
+overlap:4
+
+style a fill:#147416,color:#fff
+style b fill:#11149C,color:#fff
+style overlap fill:#481E66,color:#fff
+```
+
+
 ### Step 1. Map reference spans to viable system spans
 In this first step, we take inspiration from ACE NER evaluation metrics (see Hal Daume's [blog post comment](https://nlpers.blogspot.com/2006/08/doing-named-entity-recognition-dont.html?showComment=1156981200000#c115698122985619877)). We effectively build a bipartite graph linking
 each reference span to the "best" matching system span. Currently, we determine the best matching
@@ -75,7 +94,35 @@ $$
 \left(r_{k_{start}}, s_{end} \right)
 $$
 
+
+```mermaid
+block-beta
+columns 12
+Ref0["Ref Span 0"]:3
+space:1
+Ref1["Ref Span 1"]:3
+Ref2["Ref Span 2"]:3
+space:2
+space:1
+Sys["System Span"]:10 
+space:1
+space:1
+SysSub0["System Sub 0"]:3
+SysSub1["System Sub 1"]:3
+SysSub2["System Sub 2"]:4
+
+style Sys fill:#147416,color:#fff
+style SysSub0 fill:#147416,color:#fff
+style SysSub1 fill:#147416,color:#fff
+style SysSub2 fill:#147416,color:#fff
+
+```
+The full system span is sliced up into subspans and paired with the closest reference span; all portions of the system span are used across the subspans. (Gaps between subspans in the chart are not meant to indicate gaps in content.)
+
+
 **Example.**
+
+
 If we have the following four reference spans $(394, 512), (516, 557), (563, 633), (637, 675)$ mapped
 to the system span $(389, 678)$, this will result in the following working reference-system span pairs:
 
