@@ -23,6 +23,7 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
+  "ftfy",
 	"intspan",
 	"orjsonl",
 	"tqdm",
@@ -32,11 +33,6 @@ dependencies = [
 type-checking = [
   "mypy",
   "types-tqdm",
-]
-test = [
-  "pytest",
-  "pytest-cov",
-  "corppa[poem_id]"
 ]
 ocr = ["google-cloud-vision"]
 poem_id = [
@@ -48,7 +44,23 @@ poem_id = [
   'more-itertools; python_version < "3.12"',
 ]
 passim = ["passim @ git+https://github.com/dasmiq/passim.git"]
-dev = ["pre-commit", "ruff", "corppa[type-checking]", "corppa[test]", "corppa[ocr]", "corppa[poem_id]", "corppa[passim]"]
+chadwyck_healey = ["bs4", "lxml"]
+dev = [
+  "pre-commit",
+  "ruff",
+  "corppa[type-checking]",
+  "corppa[test]",
+  "corppa[ocr]",
+  "corppa[poem_id]",
+  "corppa[passim]",
+  "corppa[chadwyck_healey]",
+]
+test = [
+  "pytest",
+  "pytest-cov",
+  "corppa[poem_id]",
+  "corppa[chadwyck_healey]",
+]
 
 [project.scripts]
 corppa-filter = "corppa.utils.filter:main"
