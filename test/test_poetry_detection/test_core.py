@@ -1,12 +1,16 @@
 from dataclasses import replace
+from typing import Optional
 from unittest.mock import patch
 
 import pytest
 
 from corppa.poetry_detection.core import (
+    MULTIVAL_DELIMITER,
     Excerpt,
     LabeledExcerpt,
     Span,
+    field_real_type,
+    input_to_set,
 )
 
 
@@ -252,16 +256,20 @@ class TestExcerpt:
             "detection_methods": "manual",
             "excerpt_id": "m@0:1",
         }
-
-        result = excerpt.to_csv()
-        assert result == expected_result
+        assert excerpt.to_csv() == expected_result
 
         # With optional fields
         excerpt = replace(excerpt, notes="notes")
         expected_result["notes"] = "notes"
+        assert excerpt.to_csv() == expected_result
 
-        result = excerpt.to_csv()
-        assert result == expected_result
+        # with multiple values for set field
+        excerpt = replace(excerpt, detection_methods={"manual", "passim"})
+        expected_result["excerpt_id"] = "c@0:1"
+        expected_result["detection_methods"] = MULTIVAL_DELIMITER.join(
+            ["manual", "passim"]
+        )
+        assert excerpt.to_csv() == expected_result
 
     def test_from_dict(self):
         # JSONL-friendly dict
@@ -286,7 +294,7 @@ class TestExcerpt:
 
         # Error if detection_methods field has bad type
         bad_dict = csv_dict | {"detection_methods": 0}
-        error_message = "Unexpected value type for detection_methods"
+        error_message = "Unexpected value type 'int' for detection_methods"
         with pytest.raises(ValueError, match=error_message):
             Excerpt.from_dict(bad_dict)
 
@@ -372,6 +380,18 @@ class TestExcerpt:
             "notes",
             "excerpt_id",
         ]
+
+    def test_field_types(self):
+        field_types = Excerpt.field_types()
+        assert field_types == {
+            "page_id": str,
+            "ppa_span_start": int,
+            "ppa_span_end": int,
+            "ppa_span_text": str,
+            "detection_methods": set,
+            "notes": str,
+            "excerpt_id": str,
+        }
 
 
 class TestLabeledExcerpt:
@@ -518,7 +538,7 @@ class TestLabeledExcerpt:
         # Error if detection or identification methods fields have bad type
         for field in ["detection_methods", "identification_methods"]:
             bad_dict = csv_dict | {field: 0}
-            error_message = f"Unexpected value type for {field}"
+            error_message = f"Unexpected value type 'int' for {field}"
             with pytest.raises(ValueError, match=error_message):
                 LabeledExcerpt.from_dict(bad_dict)
 
@@ -534,3 +554,85 @@ class TestLabeledExcerpt:
             "ref_span_text",
             "identification_methods",
         ]
+
+    def test_field_types(self):
+        field_types = LabeledExcerpt.field_types()
+        expected_types = Excerpt.field_types()
+        expected_types.update(
+            {
+                "poem_id": str,
+                "ref_corpus": str,
+                "ref_span_start": int,
+                "ref_span_end": int,
+                "ref_span_text": str,
+                "identification_methods": set,
+            }
+        )
+
+        assert field_types == expected_types
+
+        # field types for subclass should not be the same
+        # (caching the method breaks this)
+        assert LabeledExcerpt.field_types() != Excerpt.field_types()
+
+    def test_from_excerpt(self):
+        excerpt = Excerpt(
+            page_id="page_id",
+            ppa_span_start=0,
+            ppa_span_end=1,
+            ppa_span_text="page_text",
+            detection_methods={"manual"},
+        )
+        # initialize with all required fields
+        labeled_ex = LabeledExcerpt.from_excerpt(
+            excerpt,
+            poem_id="Z1234",
+            ref_corpus="test-corpus",
+            identification_methods={"manual"},
+        )
+        # spot check resulting object
+        assert labeled_ex.page_id == excerpt.page_id
+        assert labeled_ex.excerpt_id == excerpt.excerpt_id
+        assert labeled_ex.poem_id == "Z1234"
+        assert labeled_ex.ref_corpus == "test-corpus"
+
+        # should be able to override fields
+        labeled_ex = LabeledExcerpt.from_excerpt(
+            excerpt,
+            ppa_span_end=10,
+            poem_id="Z1234",
+            ref_corpus="test-corpus",
+            identification_methods={"manual"},
+        )
+        assert labeled_ex.ppa_span_end == 10
+
+        # results in init error without required fields
+        with pytest.raises(TypeError, match="missing 3 required"):
+            LabeledExcerpt.from_excerpt(excerpt)
+
+
+def test_field_real_type():
+    # regular type
+    assert field_real_type(str) == str
+    # type annotation / alas
+    assert field_real_type(set[str]) == set
+    # optional (= union of type and NoneType)
+    assert field_real_type(Optional[int]) == int
+
+    with pytest.raises(TypeError):
+        # method doesn't support anything that isn't a type or type alias
+        field_real_type("text content")
+
+
+def test_input_to_set():
+    # string, single value
+    assert input_to_set("a") == {"a"}
+    # delimited string
+    assert input_to_set(MULTIVAL_DELIMITER.join(["a", "b"])) == {"a", "b"}
+    # list
+    assert input_to_set(["a", "b", "c"]) == {"a", "b", "c"}
+    # set
+    assert input_to_set({"a", "b", "c"}) == {"a", "b", "c"}
+    # unsupported input
+    with pytest.raises(ValueError, match="Unexpected value type 'int'"):
+        input_to_set(1)
