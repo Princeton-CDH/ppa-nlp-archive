@@ -194,12 +194,6 @@ class Excerpt:
                     json_dict[key] = value
         return json_dict
 
-    @classmethod
-    def fieldnames(cls) -> list[str]:
-        """Return a list of names for the fields in this class,
-        in order."""
-        return [f.name for f in fields(cls)]
-
     def to_csv(self) -> dict[str, int | str]:
         """
         Returns a CSV-friendly dict of the poem excerpt. Note that like `to_dict` unset
@@ -228,11 +222,7 @@ class Excerpt:
             cls_fields = [
                 f
                 for f in cls_fields
-                if (
-                    f.default == MISSING
-                    and f.default_factory == MISSING
-                    and f.init != False
-                )
+                if (f.default == MISSING and f.default_factory == MISSING and f.init)
             ]
 
         return [f.name for f in cls_fields]
