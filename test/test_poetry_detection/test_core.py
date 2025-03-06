@@ -305,6 +305,10 @@ class TestExcerpt:
         excerpt = replace(excerpt, detection_methods={"adjudication"})
         csv_dict = excerpt.to_csv()
         assert Excerpt.from_dict(csv_dict) == excerpt
+        # support string-conversion for integer fields
+        csv_dict["ppa_span_start"] = "0"
+        csv_dict["ppa_span_end"] = "1"
+        assert Excerpt.from_dict(csv_dict) == excerpt
 
         # Error if detection_methods field has bad type
         bad_dict = csv_dict | {"detection_methods": 0}
@@ -393,6 +397,16 @@ class TestExcerpt:
             "detection_methods",
             "notes",
             "excerpt_id",
+        ]
+
+    def test_fieldnames_required(self):
+        req_fieldnames = Excerpt.fieldnames(required_only=True)
+        assert req_fieldnames == [
+            "page_id",
+            "ppa_span_start",
+            "ppa_span_end",
+            "ppa_span_text",
+            "detection_methods",
         ]
 
     def test_field_types(self):
@@ -561,6 +575,10 @@ class TestLabeledExcerpt:
         # CSV-friendly dict
         csv_dict = excerpt.to_csv()
         assert LabeledExcerpt.from_dict(csv_dict) == excerpt
+        # convert strings to integers - handles empty
+        csv_dict["ref_span_start"] = ""
+        csv_dict["ref_span_end"] = ""
+        assert LabeledExcerpt.from_dict(csv_dict) == excerpt
 
         # Error if detection or identification methods fields have bad type
         for field in ["detection_methods", "identification_methods"]:
@@ -579,6 +597,14 @@ class TestLabeledExcerpt:
             "ref_span_start",
             "ref_span_end",
             "ref_span_text",
+            "identification_methods",
+        ]
+
+    def test_fieldnames_required(self):
+        req_fieldnames = LabeledExcerpt.fieldnames(required_only=True)
+        assert req_fieldnames == Excerpt.fieldnames(required_only=True) + [
+            "poem_id",
+            "ref_corpus",
             "identification_methods",
         ]
 
