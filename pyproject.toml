@@ -27,7 +27,8 @@ dependencies = [
 	"intspan",
 	"orjsonl",
 	"tqdm",
-  "biopython"
+  "biopython",
+  "pyyaml",
 ]
 
 [project.optional-dependencies]
@@ -47,7 +48,7 @@ poem_id = [
 ]
 passim = ["passim @ git+https://github.com/dasmiq/passim.git"]
 chadwyck_healey = ["bs4", "lxml"]
-notebooks = ["jupyterlab", "itables", "treon"]
+notebooks = ["jupyterlab", "itables", "treon", "polars"]
 dev = [
   "pre-commit",
   "ruff",
