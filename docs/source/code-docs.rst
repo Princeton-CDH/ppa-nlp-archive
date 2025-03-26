@@ -73,6 +73,12 @@ Process Adjudication Data
 Poetry Detection
 ================
 
+Reference Corpora
+-----------------
+.. automodule:: corppa.poetry_detection.ref_corpora
+  :members:
+
+
 Scripts
 -------
 
