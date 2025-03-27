@@ -1,9 +1,9 @@
-# corppa
+# ppa-nlp archive
 
-This repository is research software developed as part of the [Ends of Prosody](https://cdh.princeton.edu/projects/the-ends-of-prosody/), which is associated with the [Princeton Prosody Archive](https://prosody.princeton.edu/) (PPA). This software is particularly focused on research and work related to PPA full-text and page image corpora.
+This repository contains research software developed as part of the [Ends of Prosody](https://cdh.princeton.edu/projects/the-ends-of-prosody/), which is associated with the [Princeton Prosody Archive](https://prosody.princeton.edu/) (PPA). This software is particularly focused on research and work related to PPA full-text and page image corpora.
 
-> [!WARNING]
-> This code is primarily for internal team use. Some portions of it may eventually be useful for participants of the [Ends of Prosody conference](https://cdh.princeton.edu/events/the-ends-of-prosody/) or be adapted or used elsewhere.
+This archive copy includes all early experimental work in different branches, as well as preliminary work on a python package named corppa. The current, active version of the corppa codebase is available at https://github.com/Princeton-CDH/corppa 
+
 
 ## Basic Usage
 
